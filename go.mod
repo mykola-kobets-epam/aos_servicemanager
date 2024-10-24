@@ -8,7 +8,7 @@ replace github.com/coreos/go-iptables => github.com/aosedge/go-iptables v0.0.0-2
 
 replace github.com/anexia-it/fsquota => github.com/aosedge/fsquota v0.0.0-20231127111317-842d831105a7
 
-replace github.com/aosedge/aos_common => github.com/mykola-kobets-epam/aos_common v0.0.0-20241024093932-dbbe1a5e0acb
+replace github.com/aosedge/aos_common => github.com/mykola-kobets-epam/aos_common v0.0.0-20241024160449-fc183c3edc8a
 
 require (
 	github.com/aosedge/aos_common v0.0.0-20241023160100-6243007d837c

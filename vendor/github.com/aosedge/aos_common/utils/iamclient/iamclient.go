@@ -246,7 +246,7 @@ func (client *Client) SubscribeNodeInfoChange() <-chan cloudprotocol.NodeInfo {
 
 	log.Debug("Subscribe on node info change event")
 
-	ch := make(chan cloudprotocol.NodeInfo)
+	ch := make(chan cloudprotocol.NodeInfo, 1)
 	client.nodeInfoSubs.listeners = append(client.nodeInfoSubs.listeners, ch)
 
 	return ch
@@ -623,7 +623,7 @@ func (client *Client) SubscribeCertChanged(certType string) (<-chan *pb.CertInfo
 	client.Lock()
 	defer client.Unlock()
 
-	ch := make(chan *pb.CertInfo)
+	ch := make(chan *pb.CertInfo, 1)
 
 	if _, ok := client.certChangeSub[certType]; !ok {
 		grpcStream, err := client.subscribeCertChange(certType)
@@ -716,7 +716,7 @@ func (client *Client) SubscribeUnitSubjectsChanged() <-chan []string {
 
 	log.Debug("Subscribe on unit subjects change event")
 
-	ch := make(chan []string)
+	ch := make(chan []string, 1)
 	client.subjectsSubs.listeners = append(client.subjectsSubs.listeners, ch)
 
 	return ch
@@ -1034,11 +1034,8 @@ func (client *Client) reconnect() {
 			return
 
 		case <-timer.C:
-			client.Lock()
 			client.closeGRPCConnection()
 			err := client.openGRPCConnection()
-			client.Unlock()
-
 			if err != nil {
 				log.WithField("err", err).Error("Reconnection to IAM failed")
 
