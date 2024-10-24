@@ -182,8 +182,10 @@ func New(
 
 	localClient.nodeID = nodeInfo.NodeID
 
-	if localClient.systemID, err = localClient.getSystemID(); err != nil {
-		return nil, aoserrors.Wrap(err)
+	if localClient.currentNodeInfo.IsMainNode() {
+		if localClient.systemID, err = localClient.getSystemID(); err != nil {
+			return nil, aoserrors.Wrap(err)
+		}
 	}
 
 	return localClient, nil
@@ -829,16 +831,24 @@ func (client *Client) openGRPCConnection() (err error) {
 	client.publicNodesService = pb.NewIAMPublicNodesServiceClient(client.publicConnection)
 	client.publicPermissionsService = pb.NewIAMPublicPermissionsServiceClient(client.publicConnection)
 
-	if err = client.subscribeNodeInfoChange(); err != nil {
-		log.Error("Failed subscribe on NodeInfo change")
+	var nodeInfo cloudprotocol.NodeInfo
 
+	if nodeInfo, err = client.GetCurrentNodeInfo(); err != nil {
 		return aoserrors.Wrap(err)
 	}
 
-	if err = client.subscribeUnitSubjectsChange(); err != nil {
-		log.Error("Failed subscribe on UnitSubject change")
+	if nodeInfo.IsMainNode() {
+		if err = client.subscribeNodeInfoChange(); err != nil {
+			log.Error("Failed subscribe on NodeInfo change")
 
-		return aoserrors.Wrap(err)
+			return aoserrors.Wrap(err)
+		}
+
+		if err = client.subscribeUnitSubjectsChange(); err != nil {
+			log.Error("Failed subscribe on UnitSubject change")
+
+			return aoserrors.Wrap(err)
+		}
 	}
 
 	if err = client.restoreCertInfoSubs(); err != nil {

@@ -291,9 +291,6 @@ func (client *SMClient) openGRPCConnection(config *config.Config, provider Certi
 }
 
 func (client *SMClient) closeGRPCConnection() {
-	client.Lock()
-	defer client.Unlock()
-
 	log.Debug("Closing CM connection...")
 
 	if client.stream != nil {
